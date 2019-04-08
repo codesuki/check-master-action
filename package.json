@@ -1,0 +1,9 @@
+{
+  "name": "check-master",
+  "private": true,
+  "main": "entrypoint.js",
+  "license": "MIT",
+  "dependencies": {
+    "actions-toolkit": "^2.0.0"
+  }
+}
