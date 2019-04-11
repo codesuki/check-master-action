@@ -6,6 +6,7 @@ Let's say you have a monorepo with many distinct projects (e.g. terraform config
 
 ## Example
 https://github.com/codesuki/check-master-action-sample
+
 https://github.com/codesuki/check-master-action-sample/pulls
 
 # What the action does
