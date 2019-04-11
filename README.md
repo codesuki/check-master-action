@@ -4,6 +4,10 @@ GitHub Action to check whether there are any conflicting changes on master based
 # Summary
 Let's say you have a monorepo with many distinct projects (e.g. terraform configs) in seperate directories. You enable `Require branches to be up to date before merging` because you don't want terrafom to get in a bad state. If this repository has a lot of activity people will have a hard time merging because they have to merge master constantly triggering the CI.
 
+## Example
+https://github.com/codesuki/check-master-action-sample
+https://github.com/codesuki/check-master-action-sample/pulls
+
 # What the action does
 
 ## On push to master
