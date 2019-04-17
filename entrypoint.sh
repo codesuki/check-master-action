@@ -28,7 +28,7 @@ filter_paths() {
     _PATH_REGEX=$1
 
     local _FILTERED_PATHS
-    _FILTERED_PATHS="$(ggrep -o -P "$_PATH_REGEX" | uniq | sort)"
+    _FILTERED_PATHS="$(grep -o -P "$_PATH_REGEX" | uniq | sort)"
     echo "$_FILTERED_PATHS"
 }
 
