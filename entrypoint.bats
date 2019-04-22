@@ -1,16 +1,19 @@
 #!/usr/bin/env bats
 
-source 'entrypoint.sh'
 
 @test "e2e" {
+    source 'entrypoint.sh'
+
     CHANGED_PATHS_MASTER=$(cat <<'EOF'
 terraform/microservices/service-a/prd/variables.tf
+terraform/microservices/service-b/prd/variables.tf
 terraform/microservices/service-b/dev/config.tf
 EOF
                         )
 
     CHANGED_PATHS_PR=$(cat <<'EOF'
 terraform/microservices/service-a/prd/config.tf
+terraform/microservices/service-b/prd/config.tf
 EOF
                     )
 
@@ -28,15 +31,21 @@ EOF
 
     EXPECTED=$(cat <<'EOF'
 terraform/microservices/service-a/prd/
+terraform/microservices/service-b/prd/
 EOF
             )
 
-    run main master pr "terraform/microservices/[A-Za-z-]+/[A-Za-z]+/"
+    run main master pr "terraform/microservices/service-a/[A-Za-z]+/" "terraform/microservices/service-b/[A-Za-z]+/"
+
+    # run splits output on newlines. bring them back.
+    output=$( IFS=$'\n'; echo "${lines[*]}" )
     [ "$status" -eq 1 ]
-    [ "$lines" = "$EXPECTED" ]
+    [ "$output" = "$EXPECTED" ]
 }
 
 @test "matches whole path regex" {
+    source 'entrypoint.sh'
+
     CHANGED_PATHS=$(cat <<'EOF'
 terraform/microservices/service-a/prd/config.tf
 terraform/microservices/service-b/dev/config.tf
@@ -56,6 +65,8 @@ EOF
 }
 
 @test "matches up until service name" {
+    source 'entrypoint.sh'
+
     CHANGED_PATHS=$(cat <<'EOF'
 terraform/microservices/service-a/prd/config.tf
 terraform/microservices/service-b/dev/config.tf
@@ -75,6 +86,8 @@ EOF
 }
 
 @test "matches up until environment name" {
+    source 'entrypoint.sh'
+
     CHANGED_PATHS=$(cat <<'EOF'
 terraform/microservices/service-a/prd/config.tf
 terraform/microservices/service-b/dev/config.tf

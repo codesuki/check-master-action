@@ -17,36 +17,38 @@ changed_paths() {
     local _BRANCH
     _BRANCH=$2
 
-    local _CHANGED_PATHS
-    _CHANGED_PATHS="$(git diff --name-only "$_BASE_COMMIT" "$_BRANCH")"
-    echo "$_CHANGED_PATHS"
-
+    git diff --name-only "$_BASE_COMMIT" "$_BRANCH"
 }
 
 filter_paths() {
     local _PATH_REGEX
     _PATH_REGEX=$1
 
-    local _FILTERED_PATHS
-    _FILTERED_PATHS="$(grep -o -P "$_PATH_REGEX" | uniq | sort)"
-    echo "$_FILTERED_PATHS"
+    grep -o -P "$_PATH_REGEX" | uniq | sort
 }
 
 main() {
     set -e
 
-    BASE=$1
-    BRANCH=$2 #$(git rev-parse --abbrev-ref HEAD)
-    PATH_REGEX=$3
+    BASE=$1; shift
+    BRANCH=$1; shift
+    PATH_REGEXES=$@
 
     BASE_COMMIT=$(base_commit "$BASE" "$BRANCH")
 
-    PR_CHANGED_PATHS=$(changed_paths "$BASE_COMMIT" "$BRANCH" | filter_paths "$PATH_REGEX")
+    PR_CHANGED_PATHS=$(changed_paths "$BASE_COMMIT" "$BRANCH")
+    PR_MATCHED_PATHS=""
+    for regex in $PATH_REGEXES; do
+        PR_MATCHED_PATHS+=$(echo "$PR_CHANGED_PATHS" | filter_paths "$regex")$'\n'
+    done
 
-    MASTER_CHANGED_PATHS=$(changed_paths "$BASE_COMMIT" "$BASE" | filter_paths "$PATH_REGEX")
+    MASTER_CHANGED_PATHS=$(changed_paths "$BASE_COMMIT" "$BASE")
+    MASTER_MATCHED_PATHS=""
+    for regex in $PATH_REGEXES; do
+        MASTER_MATCHED_PATHS+=$(echo "$MASTER_CHANGED_PATHS" | filter_paths "$regex")$'\n'
+    done
 
-    BOTH_CHANGED_PATHS=$(comm -12 <(echo "$PR_CHANGED_PATHS") <(echo "$MASTER_CHANGED_PATHS"))
-
+    BOTH_CHANGED_PATHS=$(comm -12 <(echo "$PR_MATCHED_PATHS") <(echo "$MASTER_MATCHED_PATHS"))
     if [ -z "$BOTH_CHANGED_PATHS" ]
     then
         # OK TO MERGE
@@ -57,7 +59,6 @@ main() {
     fi
 }
 
-if [[ "${BASH_SOURCE[0]}" == "${0}" ]]
-then
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
   main "$@"
 fi
