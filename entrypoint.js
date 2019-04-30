@@ -1,6 +1,7 @@
-const {Toolkit} = require('actions-toolkit');
+const shim = require('github-action-in-circleci-shim');
+shim("check-master");
 
-// TODO: check if status already exists and update
+const {Toolkit} = require('actions-toolkit');
 
 Toolkit.run(async tools => {
   const path = tools.arguments.path || '.*';
@@ -12,9 +13,6 @@ Toolkit.run(async tools => {
   let PRs = [];
   let extractPR = (pr) => {
     return {
-      base: {
-        ref: pr.base.ref,
-      },
       head: {
         ref: pr.head.ref,
         sha: pr.head.sha,
@@ -28,17 +26,20 @@ Toolkit.run(async tools => {
       ...tools.context.repo,
     });
     PRs = pulls.data.map(pr => extractPR(pr));
-  } else if (tools.context.event === 'pull_request' &&
-             (tools.context.payload.action === 'opened' ||
-              tools.context.payload.action === 'synchronize')) {
-    PRs.push(extractPR(tools.context.payload.pull_request));
+  } else if (tools.context.event === 'push' && tools.context.ref !== baseRef) {
+    PRs.push({
+      head: {
+        ref: tools.context.ref,
+        sha: tools.context.sha,
+      }
+    });
     tools.log(`PR ${PRs[0].head.ref} changed`);
   } else {
     return;
   }
 
   for (i = 0; i < PRs.length; i++) {
-    const base_ref = 'origin/'+PRs[i].base.ref;
+    const base_ref = 'origin/'+baseRef;
     const pr_ref = 'origin/'+PRs[i].head.ref;
     const sha = PRs[i].head.sha;
 

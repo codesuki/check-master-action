@@ -24,7 +24,7 @@ filter_paths() {
     local _PATH_REGEX
     _PATH_REGEX=$1
 
-    grep -o -P "$_PATH_REGEX" | uniq | sort
+    grep -o -P "$_PATH_REGEX"
 }
 
 main() {
@@ -32,21 +32,23 @@ main() {
 
     BASE=$1; shift
     BRANCH=$1; shift
-    PATH_REGEXES=$@
+    PATH_REGEXES=("$@")
 
     BASE_COMMIT=$(base_commit "$BASE" "$BRANCH")
 
     PR_CHANGED_PATHS=$(changed_paths "$BASE_COMMIT" "$BRANCH")
     PR_MATCHED_PATHS=""
-    for regex in $PATH_REGEXES; do
+    for regex in "${PATH_REGEXES[@]}"; do
         PR_MATCHED_PATHS+=$(echo "$PR_CHANGED_PATHS" | filter_paths "$regex")$'\n'
     done
+    PR_MATCHED_PATHS=$(echo "$PR_MATCHED_PATHS" | sort | uniq)
 
     MASTER_CHANGED_PATHS=$(changed_paths "$BASE_COMMIT" "$BASE")
     MASTER_MATCHED_PATHS=""
-    for regex in $PATH_REGEXES; do
+    for regex in "${PATH_REGEXES[@]}"; do
         MASTER_MATCHED_PATHS+=$(echo "$MASTER_CHANGED_PATHS" | filter_paths "$regex")$'\n'
     done
+    MASTER_MATCHED_PATHS=$(echo "$MASTER_MATCHED_PATHS" | sort | uniq)
 
     BOTH_CHANGED_PATHS=$(comm -12 <(echo "$PR_MATCHED_PATHS") <(echo "$MASTER_MATCHED_PATHS"))
     if [ -z "$BOTH_CHANGED_PATHS" ]
