@@ -24,7 +24,7 @@ filter_paths() {
     local _PATH_REGEX
     _PATH_REGEX=$1
 
-    grep -o -P "$_PATH_REGEX"
+    grep -o -P "$_PATH_REGEX" || true
 }
 
 main() {
