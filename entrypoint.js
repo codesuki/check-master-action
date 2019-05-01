@@ -4,11 +4,9 @@ shim("check-master");
 const {Toolkit} = require('actions-toolkit');
 
 Toolkit.run(async tools => {
-  let paths = [ '.*' ];
+  let paths = tools.arguments.path || [ '.*' ];
 
-  if (Array.isArray(tools.arguments.path)) {
-    paths = tools.arguments.path;
-  } else if (typeof tools.arguments.path === 'string') {
+  if (!Array.isArray(paths)) {
     paths = [ tools.arguments.path ];
   }
 
