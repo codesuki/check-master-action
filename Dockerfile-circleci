@@ -9,11 +9,11 @@ LABEL "repository"="http://github.com/codesuki/check-master-action"
 LABEL "homepage"="http://github.com/codesuki/check-master-action"
 LABEL "maintainer"="Neri Marschik <codesuki@users.noreply.github.com>"
 
+WORKDIR /home/circleci
+
 COPY package*.json ./
 RUN npm ci
-ADD entrypoint.js /entrypoint.js
-ADD entrypoint.sh /entrypoint.sh
+ADD entrypoint.js ./entrypoint.js
+ADD entrypoint.sh ./entrypoint.sh
 
-ENTRYPOINT ["node", "/entrypoint.js"]
-
-WORKDIR /
+ENTRYPOINT ["node", "./entrypoint.js"]
