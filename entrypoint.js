@@ -44,8 +44,7 @@ Toolkit.run(async tools => {
   }
 
   for (i = 0; i < PRs.length; i++) {
-    const base_ref = 'origin/'+baseRef;
-    const pr_ref = 'origin/'+PRs[i].head.ref;
+    const prRef = 'origin/' + PRs[i].head.ref;
     const sha = PRs[i].head.sha;
 
     let createStatus = async (state) => {
@@ -59,11 +58,11 @@ Toolkit.run(async tools => {
     };
 
     try {
-      const result = await tools.runInWorkspace('/entrypoint.sh', [base_ref, pr_ref, ...paths]);
-      tools.log.success(pr_ref);
+      await tools.runInWorkspace('/entrypoint.sh', [baseRef, prRef, ...paths]);
+      tools.log.success(prRef);
       await createStatus("success");
     } catch (error) {
-      tools.log.error(pr_ref);
+      tools.log.error(prRef);
       tools.log.error(error.stdout);
       await createStatus("failure");
     }
