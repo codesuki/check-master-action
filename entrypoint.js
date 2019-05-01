@@ -4,19 +4,12 @@ shim("check-master");
 const {Toolkit} = require('actions-toolkit');
 
 Toolkit.run(async tools => {
-  let paths = [];
+  let paths = [ '.*' ];
 
-  switch(typeof tools.arguments.path) {
-    case 'string':
-      paths = [ tools.arguments.path ]
-      break;
-    case 'array':
-      paths = tools.arguments.path
-      break;
-    default:
-    case 'undefined':
-      paths = [ '.*' ]
-      break;
+  if (Array.isArray(tools.arguments.path)) {
+    paths = tools.arguments.path;
+  } else if (typeof tools.arguments.path === 'string') {
+    paths = [ tools.arguments.path ];
   }
 
   const baseRef = tools.arguments.baseRef || 'refs/heads/master';
@@ -68,7 +61,7 @@ Toolkit.run(async tools => {
     };
 
     try {
-      const result = await tools.runInWorkspace('/entrypoint.sh', [base_ref, pr_ref].concat(paths));
+      const result = await tools.runInWorkspace('/entrypoint.sh', [base_ref, pr_ref, ...paths]);
       tools.log.success(pr_ref);
       await createStatus("success");
     } catch (error) {
