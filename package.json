@@ -5,6 +5,6 @@
   "license": "MIT",
   "dependencies": {
     "actions-toolkit": "^2.0.0",
-    "github-action-in-circleci-shim": "^1.0.3"
+    "github-action-in-circleci-shim": "^1.1.0"
   }
 }
