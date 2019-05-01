@@ -58,7 +58,7 @@ Toolkit.run(async tools => {
     };
 
     try {
-      await tools.runInWorkspace('/entrypoint.sh', [baseRef, prRef, ...paths]);
+      await tools.runInWorkspace(`${__dirname}/entrypoint.sh`, [baseRef, prRef, ...paths]);
       tools.log.success(prRef);
       await createStatus("success");
     } catch (error) {
